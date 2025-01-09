@@ -10,7 +10,8 @@ struct GameKey {
 
 class MyGame : public AbstractGame {
 	private:
-		Rect box;
+		int lightPosX;
+		int lightPosY;
 
 		Vector2i velocity;
 
@@ -19,11 +20,12 @@ class MyGame : public AbstractGame {
 		/* GAMEPLAY */
 		int score, numKeys, lives;
 		bool gameWon;
+		GLuint backgroundTexture;
+		GLuint backgroundNormal;
 
 		void handleKeyEvents();
 		void update();
 		void render();
-		void renderUI();
 	public:
         MyGame();
 		~MyGame();

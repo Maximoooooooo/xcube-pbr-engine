@@ -8,13 +8,14 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include <stdio.h>
 
 #include "EngineCommon.h"
 #include "GameMath.h"
 
 /* ENGINE DEFAULT SETTINGS */
-static const int DEFAULT_WINDOW_WIDTH = 800;
-static const int DEFAULT_WINDOW_HEIGHT = 600;
+static const int DEFAULT_WINDOW_WIDTH = 1920;
+static const int DEFAULT_WINDOW_HEIGHT = 1080;
 
 static const SDL_Color SDL_COLOR_GRAY	= { 0x80, 0x80, 0x80 };
 static const SDL_Color SDL_COLOR_YELLOW = { 0xFF, 0xFF, 0 };
@@ -28,6 +29,8 @@ static const SDL_Color SDL_COLOR_ORANGE = { 0xFF, 0xA5, 0 };
 static const SDL_Color SDL_COLOR_PINK   = { 0xFF, 0xC0, 0xCB };
 static const SDL_Color SDL_COLOR_PURPLE = { 0x80, 0, 0x80 };
 static const SDL_Color SDL_COLOR_VIOLET = { 0xEE, 0x82, 0xEE };
+
+GLuint SDL_GL_GetTextureID(SDL_Texture* texture);
 
 inline SDL_Color getRandomColor(int minRGB, int maxRGB) {
 	SDL_Color color = { (Uint8)getRandom(minRGB, maxRGB), (Uint8)getRandom(minRGB, maxRGB), (Uint8)getRandom(minRGB, maxRGB) };
@@ -56,7 +59,8 @@ class GraphicsEngine {
 		SDL_Color drawColor;
 
 		TTF_Font * font;
-
+		GLuint vao, vbo;
+		GLuint shaderProgram;
 		Uint32 fpsAverage, fpsPrevious, fpsStart, fpsEnd;
 
 		GraphicsEngine();
@@ -88,13 +92,26 @@ class GraphicsEngine {
 		void fillRect(SDL_Rect *);
 		void fillRect(const int &x, const int &y, const int &w, const int &h);
 
+
+
+
+		std::string loadShaderSource(const std::string& filepath);
+		GLuint compileShader(GLenum shaderType, const std::string& shaderSource);
+		GLuint createShaderProgram(const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
+		GLuint getShaderProgram() const;
+		void drawSpotlight(Vector2i& lightPos);
+		GLuint GraphicsEngine::loadTexture(const std::string& filepath);
+		void GraphicsEngine::drawBackground(GLuint textureID);
+
 		void drawPoint(const Point2 &);
 		void drawLine(const Line2i &);
 		void drawLine(const Point2 & start, const Point2 & end);
 		void drawCircle(const Point2 & center, const float & radius);
+		void drawEllipse(const Point2& center, const float& radiusX, const float& radiusY, const SDL_Color& color);
 		void drawEllipse(const Point2 & center, const float & radiusX, const float & radiusY);
 		void drawTexture(SDL_Texture *, SDL_Rect * src, SDL_Rect * dst, const double & angle = 0.0, const SDL_Point * center = 0, SDL_RendererFlip flip = SDL_FLIP_NONE);
 		void drawTexture(SDL_Texture *, SDL_Rect * dst, SDL_RendererFlip flip = SDL_FLIP_NONE);
+		void drawText(const std::string& text, const float& x, const float& y);
 		void drawText(const std::string & text, const int &x, const int &y);
 
 		void setDrawColor(const SDL_Color &);
@@ -104,6 +121,7 @@ class GraphicsEngine {
 		* @param fileName - name of the icon file
 		*/
 		void setWindowIcon(const char * fileName);
+		void setupOrthographicProjection(int width, int height);
 		void setWindowSize(const int &, const int &);
 		void setWindowTitle(const char *title);
 		void setWindowTitle(const std::string &);
@@ -144,3 +162,5 @@ class GraphicsEngine {
 typedef GraphicsEngine GFX;
 
 #endif
+
+

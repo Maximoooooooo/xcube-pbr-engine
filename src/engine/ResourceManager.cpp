@@ -5,23 +5,23 @@ std::map<std::string, TTF_Font *> ResourceManager::fonts;
 std::map<std::string, Mix_Chunk *> ResourceManager::sounds;
 std::map<std::string, Mix_Music *> ResourceManager::mp3files;
 
-SDL_Texture * ResourceManager::loadTexture(std::string file, SDL_Color trans) {
-	SDL_Texture * texture = nullptr;
-
-	SDL_Surface * surf = IMG_Load(file.c_str());
-	if (nullptr == surf)
-		throw EngineException(IMG_GetError(), file);
-
-	SDL_SetColorKey(surf, SDL_TRUE, SDL_MapRGB(surf->format, trans.r, trans.g, trans.b));
-	
-	texture = GFX::createTextureFromSurface(surf);
-	if (nullptr == texture)
-		throw EngineException(SDL_GetError(), file);
-
-	SDL_FreeSurface(surf);
-
-	return texture;
-}
+//SDL_Texture * ResourceManager::loadTexture(std::string file, SDL_Color trans) {
+//	SDL_Texture * texture = nullptr;
+//
+//	SDL_Surface * surf = IMG_Load(file.c_str());
+//	if (nullptr == surf)
+//		throw EngineException(IMG_GetError(), file);
+//
+//	SDL_SetColorKey(surf, SDL_TRUE, SDL_MapRGB(surf->format, trans.r, trans.g, trans.b));
+//	
+//	texture = GFX::createTextureFromSurface(surf);
+//	if (nullptr == texture)
+//		throw EngineException(SDL_GetError(), file);
+//
+//	SDL_FreeSurface(surf);
+//
+//	return texture;
+//}
 
 TTF_Font * ResourceManager::loadFont(std::string file, const int & pt) {
 	TTF_Font * font = TTF_OpenFont(file.c_str(), pt);

@@ -1,9 +1,14 @@
 #include "MyGame.h"
 
-MyGame::MyGame() : AbstractGame(), score(0), lives(3), numKeys(5), gameWon(false), box(5, 5, 30, 30) {
+
+MyGame::MyGame() : AbstractGame(), score(0), lives(3), numKeys(5), gameWon(false) {
 	TTF_Font * font = ResourceManager::loadFont("res/fonts/arial.ttf", 72);
 	gfx->useFont(font);
+	gfx->setFullscreen(true);
 	gfx->setVerticalSync(true);
+	backgroundTexture = gfx->loadTexture("../res/tex/easterBG.jpg");
+	backgroundNormal = gfx->loadTexture("../res/tex/background_norm.jpg");
+	
 
     for (int i = 0; i < numKeys; i++) {
         std::shared_ptr<GameKey> k = std::make_shared<GameKey>();
@@ -13,19 +18,21 @@ MyGame::MyGame() : AbstractGame(), score(0), lives(3), numKeys(5), gameWon(false
     }
 }
 
+
+
 MyGame::~MyGame() {
 
 }
 
 void MyGame::handleKeyEvents() {
-	int speed = 3;
+	int speed = 10;
 
 	if (eventSystem->isPressed(Key::W)) {
-		velocity.y = -speed;
+		velocity.y = +speed;
 	}
 
 	if (eventSystem->isPressed(Key::S)) {
-		velocity.y = speed;
+		velocity.y = -speed;
 	}
 
 	if (eventSystem->isPressed(Key::A)) {
@@ -38,40 +45,34 @@ void MyGame::handleKeyEvents() {
 }
 
 void MyGame::update() {
-	box.x += velocity.x;
-	box.y += velocity.y;
+	// Get the current mouse position
+	int mouseX, mouseY;
+	SDL_GetMouseState(&mouseX, &mouseY);  // Get mouse position in screen coordinates
 
-	for (auto key : gameKeys) {
-		if (key->isAlive && box.contains(key->pos)) {
-			score += 200;
-			key->isAlive = false;
-			numKeys--;
-		}
-	}
+	mouseY = DEFAULT_WINDOW_HEIGHT - mouseY;
 
-	velocity.x = 0;
-    velocity.y = 0;
-
-	if (numKeys == 0) {
-		gameWon = true;
-	}
+	// Update the box's position to follow the cursor
+	lightPosX = mouseX;
+	lightPosY = mouseY;
 }
-
 void MyGame::render() {
-	gfx->setDrawColor(SDL_COLOR_RED);
-	gfx->drawRect(box);
+	gfx->clearScreen();
 
-	gfx->setDrawColor(SDL_COLOR_YELLOW);
-	for (auto key : gameKeys)
-        if (key->isAlive)
-		    gfx->drawCircle(key->pos, 5);
-}
+	GLuint shaderProgram = gfx->getShaderProgram();
+	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
 
-void MyGame::renderUI() {
-	gfx->setDrawColor(SDL_COLOR_AQUA);
-	std::string scoreStr = std::to_string(score);
-	gfx->drawText(scoreStr, 780 - scoreStr.length() * 50, 25);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, backgroundNormal);
+	glUniform1i(glGetUniformLocation(shaderProgram, "normalMap"), 1);
 
-	if (gameWon)
-		gfx->drawText("YOU WON", 250, 500);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f); glVertex2f(-1.0f, -1.0f); // Bottom-left
+	glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, -1.0f);  // Bottom-right
+	glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f);   // Top-right
+	glTexCoord2f(0.0f, 1.0f); glVertex2f(-1.0f, 1.0f);  // Top-left
+	glEnd();
+
+	Vector2i lightPos = { lightPosX, lightPosY };
+	gfx->drawSpotlight(lightPos);
+	gfx->showScreen();
 }

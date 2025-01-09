@@ -5,6 +5,9 @@ AbstractGame::AbstractGame() : running(true), paused(false), gameTime(0.0) {
 
 	// engine ready, get subsystems
 	gfx = engine->getGraphicsEngine();
+	if (!gfx) {
+		throw EngineException("Failed to get graphics engine", "gfx is null");
+	}
 	sfx = engine->getAudioEngine();
 	eventSystem = engine->getEventEngine();
 	physics = engine->getPhysicsEngine();
@@ -54,10 +57,8 @@ int AbstractGame::runMainLoop() {
 			gameTime += 0.016;	// 60 times a sec
 		}
 
-		gfx->clearScreen();
 		render();
 		renderUI();
-		gfx->showScreen();
 
 		gfx->adjustFPSDelay(16);	// atm hardcoded to ~60 FPS
 	}

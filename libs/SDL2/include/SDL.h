@@ -58,6 +58,10 @@
 #include "SDL_timer.h"
 #include "SDL_version.h"
 #include "SDL_video.h"
+#define GLEW_STATIC
+#include <glew.h>
+#include <gl/GLU.h>
+#include "SDL_opengl.h"
 
 #include "begin_code.h"
 /* Set up for C function definitions, even when using C++ */
