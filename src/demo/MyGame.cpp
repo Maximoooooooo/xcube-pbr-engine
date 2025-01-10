@@ -42,6 +42,10 @@ void MyGame::handleKeyEvents() {
 	if (eventSystem->isPressed(Key::D)) {
 		velocity.x = speed;
 	}
+
+	if (eventSystem->isPressed(Key::SPACE)) {
+		gfx->randomizeLightColor(0);
+	}
 }
 
 void MyGame::update() {
@@ -49,7 +53,7 @@ void MyGame::update() {
 	int mouseX, mouseY;
 	SDL_GetMouseState(&mouseX, &mouseY);  // Get mouse position in screen coordinates
 
-	mouseY = DEFAULT_WINDOW_HEIGHT - mouseY;
+	mouseY =  DEFAULT_WINDOW_HEIGHT-mouseY;
 
 	// Update the box's position to follow the cursor
 	lightPosX = mouseX;

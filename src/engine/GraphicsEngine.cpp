@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 
 SDL_Renderer * GraphicsEngine::renderer = nullptr;
 
@@ -17,6 +19,7 @@ GraphicsEngine::GraphicsEngine() : fpsAverage(0), fpsPrevious(0), fpsStart(0), f
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 
+	std::srand(std::time(nullptr));
 
 	// CATCHES IF WINDOW NOT CREATED
 	if (nullptr == window)
@@ -87,6 +90,7 @@ GraphicsEngine::GraphicsEngine() : fpsAverage(0), fpsPrevious(0), fpsStart(0), f
 	setupOrthographicProjection(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 	glViewport(0, 0, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 	drawColor = toSDLColor(255/255.0f, 255 / 255.0f, 255 / 255.0f, 255 / 255.0f);
+	randomizeLightColor(1);
 
 	// although not necessary, SDL doc says to prevent hiccups load it before using
 	if ((IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) != IMG_INIT_PNG)
@@ -349,6 +353,22 @@ GLuint GraphicsEngine::createShaderProgram(const std::string& vertexShaderSource
 	return shaderProgram;
 }
 
+void GraphicsEngine::randomizeLightColor(bool white) {
+	// Generate random RGB values between 0.0f and 1.0f
+	float r = 1.0;
+	float g = 1.0;
+	float b = 1.0;
+	if (!white) {
+		r = static_cast<float>(std::rand()) / RAND_MAX;
+		g = static_cast<float>(std::rand()) / RAND_MAX;
+		b = static_cast<float>(std::rand()) / RAND_MAX;
+	}
+	
+	// Update the uniform for the shader
+	glUseProgram(shaderProgram);
+	glUniform4f(glGetUniformLocation(shaderProgram, "lightColor"), r, g, b, 1.0f);
+}
+
 /* ALL DRAW FUNCTIONS */
 /* overloads explicitly call SDL funcs for better performance hopefully */
 
@@ -377,7 +397,7 @@ void GraphicsEngine::drawSpotlight(Vector2i& lightPos) {
 	glUniform2f(glGetUniformLocation(shaderProgram, "lightPos"), lightPos.x, lightPos.y);
 	glUniform1f(glGetUniformLocation(shaderProgram, "lightRadius"), 800.0f);
 	glUniform1f(glGetUniformLocation(shaderProgram, "lightIntensity"), 2.0f);
-	glUniform4f(glGetUniformLocation(shaderProgram, "lightColor"), 0.9f, 0.9f, 1.0f, 1.0f);
+	//glUniform4f(glGetUniformLocation(shaderProgram, "lightColor"), 0.9f, 0.9f, 1.0f, 1.0f);
 	glUniform1f(glGetUniformLocation(shaderProgram, "ditheringAmount"), 1.0f);
 
 	glUniform4f(glGetUniformLocation(shaderProgram, "ambientColor"), 0.0f, 0.0f, 0.0f, 1.0f);

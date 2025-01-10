@@ -93,8 +93,6 @@ class GraphicsEngine {
 		void fillRect(const int &x, const int &y, const int &w, const int &h);
 
 
-
-
 		std::string loadShaderSource(const std::string& filepath);
 		GLuint compileShader(GLenum shaderType, const std::string& shaderSource);
 		GLuint createShaderProgram(const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
@@ -102,6 +100,7 @@ class GraphicsEngine {
 		void drawSpotlight(Vector2i& lightPos);
 		GLuint GraphicsEngine::loadTexture(const std::string& filepath);
 		void GraphicsEngine::drawBackground(GLuint textureID);
+		void GraphicsEngine::randomizeLightColor(bool white);
 
 		void drawPoint(const Point2 &);
 		void drawLine(const Line2i &);
